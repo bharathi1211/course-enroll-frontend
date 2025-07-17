@@ -9,33 +9,35 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
-import api from '../api';
+import { ref } from 'vue'
+import api from '../api'
+import { useRouter } from 'vue-router'
 
-const username = ref('');
-const password = ref('');
-const error = ref('');
+const username = ref('')
+const password = ref('')
+const error = ref('')
+const router = useRouter()
 
 async function login() {
-  error.value = '';
+  error.value = ''
   try {
     const response = await api.post('/login', {
       username: username.value,
       password: password.value,
-    });
+    })
 
-    const token = response.data.token;
-    localStorage.setItem('token', token);
+    const token = response.data.token
+    localStorage.setItem('token', token)
 
-    alert('Login successful');
-    window.location.href = '/home'; 
+    alert('Login successful')
+    
+    router.push('/home')
   } catch (err) {
-    console.error(err);
-    error.value = 'Invalid username or password';
+    console.error(err)
+    error.value = 'Invalid username or password'
   }
 }
 </script>
-
 <style scoped>
 .login-wrap{
   display: flex;

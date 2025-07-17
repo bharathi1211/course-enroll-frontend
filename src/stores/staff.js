@@ -9,8 +9,13 @@ export const useStaffStore = defineStore('staff', {
     actions: {
        async fetchStaff() {
       try {
-        const response = await api.get('/admin/staff');
-        console.log('Fetched staff:', response.data);
+        const token = localStorage.getItem('token');
+        const response = await api.get('/admin/staff',{
+          headers:{
+            Authorization : `Bearer ${token}`
+          }
+        });
+        console.log('Fetched staff:', response.data.staff);
         this.staffList = response.data.staff.map(staff => ({
           id: staff.staffId,
           name: staff.staffName,
@@ -21,6 +26,7 @@ export const useStaffStore = defineStore('staff', {
         console.error('Failed to fetch staff:', error);
       }
     },
+    
         addStaff(staff) {
             this.staffList.push({...staff,editing:false});
         },

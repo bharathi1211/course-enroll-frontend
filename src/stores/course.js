@@ -8,9 +8,17 @@ export const useCourseStore = defineStore('course', {
   }),
 
   actions: {
-    async fetchCourses() {
+    
+async fetchCourses() {
   try {
-    const response = await api.get('/admin/course');
+    const token = localStorage.getItem('token'); 
+
+    const response = await api.get('/admin/course', {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    });
+
     console.log('Courses response:', response.data.course);
 
     this.courses = response.data.course.map(course => ({
@@ -26,7 +34,6 @@ export const useCourseStore = defineStore('course', {
     console.error('Failed to fetch courses:', error);
   }
 },
-
 
     addCourse(course) {
       this.courses.push({ ...course, editing: false });

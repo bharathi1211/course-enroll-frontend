@@ -43,6 +43,8 @@ const newStaff = ref({
 const headers = ref(['id', 'name', 'department']);
 
 async function createStaff() {
+  console.log(newStaff.value);
+  
   const error = validateStaff(newStaff.value);
   if (error) {
     alert(error);
@@ -54,9 +56,10 @@ async function createStaff() {
     staff_name: newStaff.value.name,
     department: newStaff.value.department,
   };
-
+  const token = localStorage.getItem('token'); 
+  console.log("payload",payload)
   try {
-    await api.post('/admin/staff/add', payload);
+    await api.post('/admin/staff/add', payload,{ headers: {Authorization: `Bearer ${token}`,'Content-Type': 'application/json'}});
     staffStore.addStaff(newStaff.value);
     newStaff.value = { id: '', name: '', department: '' };
   } catch (err) {
