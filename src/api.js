@@ -11,5 +11,5 @@ const api = axios.create({
 //   }
 //   return config;
 // });
-api.defaults.headers.post['Content-Type'] = 'application/json';
+//api.defaults.headers.post['Content-Type'] = 'application/json';
 export default api;

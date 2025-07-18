@@ -107,25 +107,34 @@ function toggleSort(header) {
 }
 
 function save(index, item) {
-  const cleanedItem = {
-    course_id: Number(item.id),
-    course_name: item.name?.trim(),
-    department: item.department?.trim(),
-    staff_id: Number(item.staffId),
-  };
+  const cleanedItem = { ...item };
 
-  if (
-    isNaN(cleanedItem.course_id) ||
-    isNaN(cleanedItem.staff_id) ||
-    !cleanedItem.course_name ||
-    !cleanedItem.department
-  ) {
+  for (const key in cleanedItem) {
+    if (typeof cleanedItem[key] === "string") {
+      cleanedItem[key] = cleanedItem[key].trim();
+    }
+  }
+  for (const key in cleanedItem) {
+    if (/id$/i.test(key)) {
+      cleanedItem[key] = Number(cleanedItem[key]);
+    }
+  }
+  const hasEmptyFields = Object.entries(cleanedItem).some(([key, value]) => {
+    return (
+      (typeof value === "string" && value.trim() === "") ||
+      (typeof value === "number" && isNaN(value))
+    );
+  });
+
+  if (hasEmptyFields) {
     alert("Please fill in all fields correctly before saving.");
     return;
   }
+
   item.editing = false;
-  emit('update', index, cleanedItem);
+  emit("update", index, cleanedItem);
 }
+
 
 </script>
 

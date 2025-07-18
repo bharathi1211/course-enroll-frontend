@@ -13,7 +13,7 @@ export function validateStaff(staff) {
     return 'Staff ID must be positive numbers';
   }
   if(staff.name.length < 3) {
-    return 'Course name must be at least 3 characters long';
+    return 'Staff name must be at least 3 characters long';
   }
   if (staff.department.length < 2) {
     return 'Department name must be at least 2 characters long';

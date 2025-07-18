@@ -6,6 +6,8 @@
       <input v-model="newStaff.name" placeholder="Staff Name" />
       <input v-model="newStaff.department" placeholder="Department" />
       <button @click="createStaff">Create</button>
+
+      <p v-if="error" class="error">{{ error }}</p>
     </div>
 
     <div class="right , panel">
@@ -30,6 +32,7 @@ import DataTable from './DataTable.vue';
 import { validateStaff } from '../validation/staffvalidator';
 import {handleApiError} from '../errhandler.js';
 import api from '../api';
+const error = ref('')
 const staffStore = useStaffStore();
 onMounted(()=> {
   staffStore.fetchStaff();
@@ -44,10 +47,10 @@ const headers = ref(['id', 'name', 'department']);
 
 async function createStaff() {
   console.log(newStaff.value);
-  
-  const error = validateStaff(newStaff.value);
-  if (error) {
-    alert(error);
+  const err = validateStaff(newStaff.value);
+  if (err) {
+    // alert(error);
+    error.value=err;
     return;
   }
 
@@ -67,12 +70,37 @@ async function createStaff() {
   }
 }
 
-function handleUpdate(index, updatedStaff) {
-  staffStore.updateStaff(index,updatedStaff);
+async function handleUpdate(index, updatedStaff) {
+  const payload = {
+    staff_id : updatedStaff.id,
+    staff_name : updatedStaff.name,
+    department : updatedStaff.department}
+  console.log(payload);
+  try {
+    const token = localStorage.getItem('token');
+    await api.put(`/admin/staff/${payload.staff_id}`, payload,{headers:{Authorization:`Bearer ${token}`,'Content-Type': 'application/json'}});
+    staffStore.updateStaff(index,{
+      name: payload.staff_name,
+      department: payload.department,
+      id: payload.staff_id
+    });
+    newStaff.value = { id: '', name: '', department: ''};
+  } catch (err) {
+    handleApiError(err, 'Failed to update staff');
+  }
 }
 
-function handleDelete(index) {
-  staffStore.deleteStaff(index);
+async function handleDelete(index) {
+const staff = staffStore.staffList[index];
+  if (!staff) return;
+
+  try {
+    const token = localStorage.getItem("token");
+    await api.delete(`/admin/staff/${staff.id}`,{headers:{Authorization:`Bearer ${token}`,'Content-Type': 'application/json'}});
+    staffStore.deleteStaff(index); 
+  } catch (err) {
+    handleApiError(err, 'Failed to delete course');
+  }
 }
 
 function handleSort(key, direction) {
@@ -97,13 +125,16 @@ function handleSort(key, direction) {
   flex-direction: column;
   align-items: center;
 }
-
+.error{
+  color:rgb(174, 79, 79);
+}
 input {
   display: block;
   margin: 0.5rem 0;
   padding: 6px;
   width: 80%;
-  border-color: #68ac73;
+  border-color:transparent;
+  border-radius: 5px;
 }
 button:hover {
   background-color: #b9d1a4;

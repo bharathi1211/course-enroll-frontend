@@ -42,6 +42,7 @@ const courseStore = useCourseStore();
 onMounted(()=> {
   courseStore.fetchCourses();
 });
+const token = localStorage.getItem('token');
 // const staffStore = useStaffStore();
 
     // const idExists = courseStore.courses.some(course => course.id === Number(newCourse.value.id));
@@ -75,7 +76,7 @@ async function createCourse() {
     //payload.staff_id = Number(payload.staff_id);
     console.log(payload);
     
-    await api.post('/admin/course/add', payload);
+    await api.post('/admin/course/add', payload,{headers:{Authorization:`Bearer ${token}`,'Content-Type': 'application/json'}});
     courseStore.addCourse(newCourse.value);
     newCourse.value = { id: '', name: '', department: '', staffId: '' };
   } catch (err) {
@@ -88,7 +89,8 @@ async function handleUpdate(index,course) {
   const payload = course;
   //console.log("payload",payload);
   try {
-    await api.put(`/admin/course/${payload.course_id}`, payload);
+    
+    await api.put(`/admin/course/${payload.course_id}`, payload,{headers:{Authorization:`Bearer ${token}`,'Content-Type': 'application/json'}});
     courseStore.updateCourse(index,{
       id: payload.course_id,
       name: payload.course_name,
@@ -106,7 +108,7 @@ async function handleDelete(index) {
   if (!course) return;
 
   try {
-    await api.delete(`/admin/course/${course.id}`);
+    await api.delete(`/admin/course/${course.id}`,{headers:{Authorization:`Bearer ${token}`,'Content-Type': 'application/json'}});
     courseStore.deleteCourse(index); 
   } catch (err) {
     handleApiError(err, 'Failed to delete course');
