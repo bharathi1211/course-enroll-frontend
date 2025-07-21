@@ -8,6 +8,7 @@
       <button @click="createStaff">Create</button>
 
       <p v-if="error" class="error">{{ error }}</p>
+      <p v-if="successmsg" class="success">{{ successmsg }}</p>
     </div>
 
     <div class="right , panel">
@@ -33,6 +34,7 @@ import { validateStaff } from '../validation/staffvalidator';
 import {handleApiError} from '../errhandler.js';
 import api from '../api';
 const error = ref('')
+const successmsg = ref('')
 const staffStore = useStaffStore();
 onMounted(()=> {
   staffStore.fetchStaff();
@@ -46,6 +48,8 @@ const newStaff = ref({
 const headers = ref(['id', 'name', 'department']);
 
 async function createStaff() {
+  error.value = '';
+  successmsg.value = '';
   console.log(newStaff.value);
   const err = validateStaff(newStaff.value);
   if (err) {
@@ -59,12 +63,13 @@ async function createStaff() {
     staff_name: newStaff.value.name,
     department: newStaff.value.department,
   };
-  const token = localStorage.getItem('token'); 
+  const token = sessionStorage.getItem('token'); 
   console.log("payload",payload)
   try {
     await api.post('/admin/staff/add', payload,{ headers: {Authorization: `Bearer ${token}`,'Content-Type': 'application/json'}});
     staffStore.addStaff(newStaff.value);
     newStaff.value = { id: '', name: '', department: '' };
+    successmsg.value='Successfully created';
   } catch (err) {
     handleApiError(err, 'Failed to create course');
   }
@@ -77,7 +82,7 @@ async function handleUpdate(index, updatedStaff) {
     department : updatedStaff.department}
   console.log(payload);
   try {
-    const token = localStorage.getItem('token');
+    const token = sessionStorage.getItem('token');
     await api.put(`/admin/staff/${payload.staff_id}`, payload,{headers:{Authorization:`Bearer ${token}`,'Content-Type': 'application/json'}});
     staffStore.updateStaff(index,{
       name: payload.staff_name,
@@ -95,7 +100,7 @@ const staff = staffStore.staffList[index];
   if (!staff) return;
 
   try {
-    const token = localStorage.getItem("token");
+    const token = sessionStorage.getItem("token");
     await api.delete(`/admin/staff/${staff.id}`,{headers:{Authorization:`Bearer ${token}`,'Content-Type': 'application/json'}});
     staffStore.deleteStaff(index); 
   } catch (err) {
@@ -128,6 +133,9 @@ function handleSort(key, direction) {
 .error{
   color:rgb(174, 79, 79);
 }
+.success{
+  color:rgb(84, 122, 8);
+}
 input {
   display: block;
   margin: 0.5rem 0;
@@ -138,9 +146,10 @@ input {
 }
 button:hover {
   background-color: #b9d1a4;
+  color:white;
 }
 .panel {
-  background-color: #EEEFE0; /* lighter than background */
+  background-color: #EEEFE0; 
   padding: 2rem;
   border-radius: 10px;
   border: 1px solid #d3e4cd;
@@ -153,6 +162,7 @@ button {
   padding: 6px 12px;
   cursor: pointer;
   outline: none; 
+  color:#819A91;
 }
 
 table {

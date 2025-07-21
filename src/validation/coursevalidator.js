@@ -10,7 +10,12 @@ export function validateCourse(course) {
   if (isNaN(courseId)) {
     return 'Course ID must be a number';
   }
-
+  if(/\d/.test(course.name)) {
+    return 'Course name can not have numbers'
+  }
+  if(/\d/.test(course.department)) {
+    return 'Department can not have numbers'
+  }
   if (isNaN(staffId)) {
     return 'Staff ID must be a number';
   }

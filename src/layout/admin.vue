@@ -2,7 +2,16 @@
   <div class="app-container">
     <div class="top-bar">
       <button class="hamburger" @click="toggleSidebar">☰</button>
-      <h1>Course Enrollment</h1>
+      <h1 class="heading">Course Enrollment</h1>
+
+      <!-- Profile Dropdown Section -->
+      <div class="profile-section" @click="toggleDropdown">
+        <div class="profile-circle">👤</div>
+        <div v-if="showDropdown" class="dropdown" @click.stop>
+          <p class="username">Hi, {{ username }}</p>
+          <button @click="logout">Logout</button>
+        </div>
+      </div>
     </div>
 
     <div class="sidebar" :class="{ open: isSidebarOpen }">
@@ -11,24 +20,40 @@
     </div>
 
     <div class="main-content" @click="closeSidebar">
-        <slot />
+      <slot />
     </div>
   </div>
 </template>
 
-<script setup>
-import { ref } from 'vue';
 
-const isSidebarOpen = ref(false);
+<script setup>
+import { ref } from 'vue'
+import { useRouter } from 'vue-router'
+
+const isSidebarOpen = ref(false)
+const showDropdown = ref(false)
+const username = ref(sessionStorage.getItem('username') || 'admin')
+const router = useRouter()
 
 function toggleSidebar() {
-  isSidebarOpen.value = !isSidebarOpen.value;
+  isSidebarOpen.value = !isSidebarOpen.value
 }
 
 function closeSidebar() {
-  isSidebarOpen.value = false;
+  isSidebarOpen.value = false
+}
+
+function toggleDropdown() {
+  showDropdown.value = !showDropdown.value
+}
+
+function logout() {
+  sessionStorage.removeItem('token')
+  sessionStorage.removeItem('username')
+  router.push('/')
 }
 </script>
+
 
 <style>
 body {
@@ -105,4 +130,57 @@ h1 {
 .main-content {
   padding: 1rem;
 }
+.top-bar {
+  display: flex;
+  justify-content: space-between; /* Pushes profile to right */
+  align-items: center;
+  background-color: #819A91;
+  color: white;
+  padding: 0.6rem 1rem;
+  width: 100%;
+  box-sizing: border-box;
+  height: 60px;
+  position: relative;
+}
+
+.heading {
+  flex-grow: 1;
+  text-align: center;
+}
+
+.profile-section {
+  position: relative;
+  cursor: pointer;
+}
+
+.profile-circle {
+  width: 40px;
+  height: 40px;
+  background-color: white;
+  color: #819A91;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+}
+
+.dropdown {
+  position: absolute;
+  top: 50px;
+  right: 0;
+  background-color: white;
+  color: #333;
+  padding: 10px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+  border-radius: 8px;
+  width: 160px;
+  z-index: 999;
+}
+
+.username {
+  font-weight: bold;
+  margin-bottom: 8px;
+}
+
 </style>

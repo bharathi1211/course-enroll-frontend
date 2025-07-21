@@ -11,7 +11,7 @@ export const useCourseStore = defineStore('course', {
     
 async fetchCourses() {
   try {
-    const token = localStorage.getItem('token'); 
+    const token = sessionStorage.getItem('token'); 
 
     const response = await api.get('/admin/course', {
       headers: {

@@ -7,6 +7,9 @@
     <input v-model="newCourse.department" placeholder="Department" />
     <input v-model="newCourse.staffId" placeholder="StaffId" />
     <button @click="createCourse">Create</button>
+
+    <p v-if="error" class="error">{{ error }}</p>
+    <p v-if="successmsg" class="success">{{ successmsg }}</p>
     </div>
 
     <div class="right , panel">
@@ -31,6 +34,8 @@ import { useCourseStore } from '../stores/course'
 import api from '../api';
 import { validateCourse } from '../validation/coursevalidator'
 import { handleApiError } from '../errhandler';
+const error = ref('')
+const successmsg = ref('')
 const newCourse = ref({
   id: '',
   name: '',
@@ -41,8 +46,15 @@ const headers = ref(['id', 'name','department','staffId']);
 const courseStore = useCourseStore();
 onMounted(()=> {
   courseStore.fetchCourses();
+  // const handleUnload = () => {
+  //   localStorage.removeItem('token')
+  // }
+  // window.addEventListener('beforeunload', handleUnload)
+  // onBeforeUnmount(() => {
+  //   window.removeEventListener('beforeunload', handleUnload)
+  // })
 });
-const token = localStorage.getItem('token');
+const token = sessionStorage.getItem('token');
 // const staffStore = useStaffStore();
 
     // const idExists = courseStore.courses.some(course => course.id === Number(newCourse.value.id));
@@ -58,9 +70,12 @@ const token = localStorage.getItem('token');
 
 
 async function createCourse() {
-  const error = validateCourse(newCourse.value);
-  if (error) {
-    alert(error);
+   error.value = '';
+    successmsg.value = '';
+  const err = validateCourse(newCourse.value);
+   if (err) {
+    // alert(error);
+    error.value=err;
     return;
   }
 
@@ -79,6 +94,7 @@ async function createCourse() {
     await api.post('/admin/course/add', payload,{headers:{Authorization:`Bearer ${token}`,'Content-Type': 'application/json'}});
     courseStore.addCourse(newCourse.value);
     newCourse.value = { id: '', name: '', department: '', staffId: '' };
+    successmsg.value='Successfully created';
   } catch (err) {
     handleApiError(err, 'Failed to create course');
   }
@@ -87,7 +103,7 @@ async function createCourse() {
 
 async function handleUpdate(index,course) {
   const payload = course;
-  //console.log("payload",payload);
+  console.log("payload",payload);
   try {
     
     await api.put(`/admin/course/${payload.course_id}`, payload,{headers:{Authorization:`Bearer ${token}`,'Content-Type': 'application/json'}});
@@ -128,7 +144,12 @@ function handleSort(key, direction) {
   gap: 2rem;
   padding: 0 0 0 15rem;
 }
-
+.error{
+  color:rgb(174, 79, 79);
+}
+.success{
+  color:rgb(84, 122, 8);
+}
 .left,
 .right {
   display: flex;
@@ -150,14 +171,18 @@ input {
   margin: 0.5rem 0;
   padding: 6px;
   width: 80%;
+  border-color:transparent;
+  border-radius: 5px;
 }
 button:hover {
   background-color: #b9d1a4;
+  color:white;
 }
 
 button {
   margin-top: 0.5rem;
   outline: none; 
+  color:#819A91;
 }
 
 table {

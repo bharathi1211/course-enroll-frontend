@@ -9,7 +9,7 @@ export const useStaffStore = defineStore('staff', {
     actions: {
        async fetchStaff() {
       try {
-        const token = localStorage.getItem('token');
+        const token = sessionStorage.getItem('token');
         const response = await api.get('/admin/staff',{
           headers:{
             Authorization : `Bearer ${token}`

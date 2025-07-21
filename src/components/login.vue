@@ -32,11 +32,15 @@ async function login() {
     })
 
     const token = response.data.token
-    localStorage.setItem('token', token)
+    sessionStorage.setItem('token', token)
+    sessionStorage.setItem('username', username.value)
 
     // alert('Login successful')
-    successMessage.value = 'Login successful'
-    setTimeout(() => {router.push('/home')}, 1000)
+    successMessage.value = 'Login successful';
+    if(username.value==='admin'){
+      console.log("yes");
+      setTimeout(() => {router.push('/home')}, 1000);
+    }
   } catch (err) {
     console.error(err)
     error.value = 'Invalid username or password'

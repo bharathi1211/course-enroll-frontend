@@ -12,7 +12,7 @@ const routes = [
     history : createWebHistory(),routes
   })
   router.beforeEach((to,from, next) => {
-    const token = localStorage.getItem('token');
+    const token = sessionStorage.getItem('token');
     if(to.meta.requireAuth && !token) {
       next('/');
     }
